@@ -1,4 +1,4 @@
-package com.example.zoomclone.project;
+package com.mountblue.zoomclone.project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

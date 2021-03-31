@@ -1,4 +1,4 @@
-package com.example.zoomclone.project;
+package com.mountblue.zoomclone.project;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
