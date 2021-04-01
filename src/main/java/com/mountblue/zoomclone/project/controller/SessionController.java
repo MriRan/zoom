@@ -21,18 +21,13 @@ import io.openvidu.java.client.Session;
 @Controller
 public class SessionController {
 
-    private OpenVidu openVidu;
+    private final OpenVidu openVidu;
 
-    private Map<String, Session> mapSessions = new ConcurrentHashMap<>();
-    private Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
-
-    private String OPENVIDU_URL;
-    private String SECRET;
+    private final Map<String, Session> mapSessions = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
 
     public SessionController(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl) {
-        this.SECRET = secret;
-        this.OPENVIDU_URL = openviduUrl;
-        this.openVidu = new OpenVidu(OPENVIDU_URL, SECRET);
+        this.openVidu = new OpenVidu(openviduUrl, secret);
     }
 
     @RequestMapping(value = "/session", method = RequestMethod.POST)
@@ -46,7 +41,7 @@ public class SessionController {
         }
         System.out.println("Getting sessionId and token | {sessionName}={" + sessionName + "}");
 
-        OpenViduRole role = LoginController.users.get(httpSession.getAttribute("loggedUser")).role;
+        OpenViduRole role = LoginController.users.get(httpSession.getAttribute("loggedUser")).getRole();
         String serverData = "{\"serverData\": \"" + httpSession.getAttribute("loggedUser") + "\"}";
 
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC)
@@ -57,14 +52,7 @@ public class SessionController {
             try {
                 String token = this.mapSessions.get(sessionName).createConnection(connectionProperties).getToken();
 
-                this.mapSessionNamesTokens.get(sessionName).put(token, role);
-
-                model.addAttribute("sessionName", sessionName);
-                model.addAttribute("token", token);
-                model.addAttribute("nickName", clientData);
-                model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
-
-                return "session";
+                return getString(clientData, sessionName, model, httpSession, role, token);
 
             } catch (Exception e) {
                 model.addAttribute("username", httpSession.getAttribute("loggedUser"));
@@ -79,20 +67,24 @@ public class SessionController {
 
                 this.mapSessions.put(sessionName, session);
                 this.mapSessionNamesTokens.put(sessionName, new ConcurrentHashMap<>());
-                this.mapSessionNamesTokens.get(sessionName).put(token, role);
-
-                model.addAttribute("sessionName", sessionName);
-                model.addAttribute("token", token);
-                model.addAttribute("nickName", clientData);
-                model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
-
-                return "session";
+                return getString(clientData, sessionName, model, httpSession, role, token);
 
             } catch (Exception e) {
                 model.addAttribute("username", httpSession.getAttribute("loggedUser"));
                 return "dashboard";
             }
         }
+    }
+
+    private String getString(@RequestParam(name = "data") String clientData, @RequestParam(name = "session-name") String sessionName, Model model, HttpSession httpSession, OpenViduRole role, String token) {
+        this.mapSessionNamesTokens.get(sessionName).put(token, role);
+
+        model.addAttribute("sessionName", sessionName);
+        model.addAttribute("token", token);
+        model.addAttribute("nickName", clientData);
+        model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
+
+        return "session";
     }
 
     @RequestMapping(value = "/leave-session", method = RequestMethod.POST)
@@ -112,17 +104,15 @@ public class SessionController {
                 if (this.mapSessionNamesTokens.get(sessionName).isEmpty()) {
                     this.mapSessions.remove(sessionName);
                 }
-                return "redirect:/dashboard";
 
             } else {
                 System.out.println("Problems in the app server: the TOKEN wasn't valid");
-                return "redirect:/dashboard";
             }
 
         } else {
             System.out.println("Problems in the app server: the SESSION does not exist");
-            return "redirect:/dashboard";
         }
+        return "redirect:/dashboard";
     }
 
     private void checkUserLogged(HttpSession httpSession) throws Exception {
