@@ -1,22 +1,18 @@
 package com.mountblue.zoomclone.project.controller;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpSession;
-
+import com.mountblue.zoomclone.project.serviceImplementation.UserPrincipal;
+import io.openvidu.java.client.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.openvidu.java.client.ConnectionProperties;
-import io.openvidu.java.client.ConnectionType;
-import io.openvidu.java.client.OpenVidu;
-import io.openvidu.java.client.OpenViduRole;
-import io.openvidu.java.client.Session;
+import javax.servlet.http.HttpSession;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 public class SessionController {
@@ -32,7 +28,8 @@ public class SessionController {
 
     @RequestMapping(value = "/session", method = RequestMethod.POST)
     public String joinSession(@RequestParam(name = "data") String clientData,
-                              @RequestParam(name = "session-name") String sessionName, Model model, HttpSession httpSession) {
+                              @RequestParam(name = "session-name") String sessionName,
+                              @AuthenticationPrincipal UserPrincipal principal, Model model, HttpSession httpSession) {
 
         try {
             checkUserLogged(httpSession);
@@ -41,7 +38,7 @@ public class SessionController {
         }
         System.out.println("Getting sessionId and token | {sessionName}={" + sessionName + "}");
 
-        OpenViduRole role = LoginController.users.get(httpSession.getAttribute("loggedUser")).getRole();
+        OpenViduRole role = OpenViduRole.PUBLISHER;
         String serverData = "{\"serverData\": \"" + httpSession.getAttribute("loggedUser") + "\"}";
 
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC)
@@ -96,7 +93,7 @@ public class SessionController {
         } catch (Exception e) {
             return "index";
         }
-        System.out.println("Removing user | sessioName=" + sessionName + ", token=" + token);
+        System.out.println("Removing user | sessionName=" + sessionName + ", token=" + token);
 
         if (this.mapSessions.get(sessionName) != null && this.mapSessionNamesTokens.get(sessionName) != null) {
 

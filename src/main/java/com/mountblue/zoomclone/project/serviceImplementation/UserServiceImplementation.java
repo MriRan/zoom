@@ -18,7 +18,7 @@ public class UserServiceImplementation implements UserService {
 
     @Transactional
     @Override
-    public void registerNewUser(String name, String role, String password) {
+    public void registerNewUser(String name, String password, String role) {
         repository.save(new Users(name, bCryptPasswordEncoder.encode(password), OpenViduRole.valueOf(role)));
     }
 }
