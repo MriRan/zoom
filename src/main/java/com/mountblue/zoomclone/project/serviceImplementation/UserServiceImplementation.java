@@ -3,7 +3,6 @@ package com.mountblue.zoomclone.project.serviceImplementation;
 import com.mountblue.zoomclone.project.model.Users;
 import com.mountblue.zoomclone.project.repository.UserRepository;
 import com.mountblue.zoomclone.project.service.UserService;
-import io.openvidu.java.client.OpenViduRole;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ public class UserServiceImplementation implements UserService {
 
     @Transactional
     @Override
-    public void registerNewUser(String name, String password, String role) {
-        repository.save(new Users(name, bCryptPasswordEncoder.encode(password), OpenViduRole.valueOf(role)));
+    public void registerNewUser(String name, String password) {
+        repository.save(new Users(name, bCryptPasswordEncoder.encode(password)));
     }
 }

@@ -55,10 +55,9 @@ public class LoginController {
 
     @PostMapping("/register")
     public String register(@RequestParam String name,
-                           @RequestParam String email,
                            @RequestParam String password){
 
-        userService.registerNewUser(name,password,"SUBSCRIBER");
+        userService.registerNewUser(name,password);
         return "redirect:/";
     }
 }

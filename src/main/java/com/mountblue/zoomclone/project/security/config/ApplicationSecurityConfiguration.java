@@ -1,4 +1,4 @@
-package com.mountblue.zoomclone.project.security;
+package com.mountblue.zoomclone.project.security.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +12,7 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests().anyRequest().permitAll();
 //                .antMatchers("/css/**", "/image/**", "/", "/login", "/register", "/h2-console/**").permitAll()
 //                .antMatchers("/home").hasAuthority("USER").anyRequest()

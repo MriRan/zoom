@@ -1,13 +1,11 @@
 package com.mountblue.zoomclone.project.model;
 
-import io.openvidu.java.client.OpenViduRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -28,15 +26,11 @@ public class Users {
 	private String name;
 
 	@NotNull
-	private OpenViduRole role;
-
-	@NotNull
    	@Length(min = 5, message = "Your password must have at least 5 characters")
 	private String password;
 
-	public Users(String name,String password, OpenViduRole role) {
+	public Users(String name,String password) {
 		this.name = name;
 		this.password = password;
-		this.role = role;
 	}
 }
