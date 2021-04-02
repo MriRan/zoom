@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th = "http://www.thymeleaf.org">
+<html>
 
 <head>
 	<title>openvidu-mvc-java</title>
@@ -25,7 +24,7 @@
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="/">
-					<img class="demo-logo" src="images/openvidu_vert_white_bg_trans_cropped.png"  alt=""/> MVC Java</a>
+					<img class="demo-logo" src="images/openvidu_vert_white_bg_trans_cropped.png" /> MVC Java</a>
 				<a class="navbar-brand nav-icon" href="https://github.com/OpenVidu/openvidu-tutorials/tree/master/openvidu-mvc-java" title="GitHub Repository"
 				 target="_blank">
 					<i class="fa fa-github" aria-hidden="true"></i>
@@ -52,7 +51,7 @@
 				<div id="main-video" class="col-md-6">
 					<p class="nickName"></p>
 					<p class="userName"></p>
-					<video autoplay="autoplay" playsinline></video>
+					<video autoplay="autoplay" playsinline="true"></video>
 				</div>
 				<div id="video-container" class="col-md-6"></div>
 			</div>
@@ -63,7 +62,7 @@
 		<div class="container">
 			<div class="text-muted">OpenVidu © 2017</div>
 			<a href="http://www.openvidu.io/" target="_blank">
-				<img class="openvidu-logo" src="images/openvidu_globe_bg_transp_cropped.png"  alt=""/>
+				<img class="openvidu-logo" src="images/openvidu_globe_bg_transp_cropped.png" />
 			</a>
 		</div>
 	</footer>
@@ -73,10 +72,10 @@
 <script th:inline="javascript">
 
 	// Get all the attributes from the template in Thymeleaf style
-	const sessionName = [[${ sessionName }]];
-	const token = [[${ token }]];
-	const nickName = [[${ nickName }]];
-	const userName = [[${ userName }]];
+	var sessionName = [[${ sessionName }]];
+	var token = [[${ token }]];
+	var nickName = [[${ nickName }]];
+	var userName = [[${ userName }]];
 
 	console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 
@@ -95,7 +94,7 @@
 
 		// Subscribe to the Stream to receive it
 		// HTML video will be appended to element with 'video-container' id
-		const subscriber = session.subscribe(event.stream, 'video-container');
+		var subscriber = session.subscribe(event.stream, 'video-container');
 
 		// When the HTML video has been appended to DOM...
 		subscriber.on('videoElementCreated', (event) => {
@@ -132,14 +131,14 @@
 
 				// --- 6) Get your own camera stream ---
 
-				const publisher = OV.initPublisher('video-container', {
+				var publisher = OV.initPublisher('video-container', {
 					audioSource: undefined, // The source of audio. If undefined default microphone
 					videoSource: undefined, // The source of video. If undefined default webcam
 					publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
 					publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
 					resolution: '640x480',  // The resolution of your video
 					frameRate: 30,			// The frame rate of your video
-					insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
+					inse3rtMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
 					mirror: false       	// Whether to mirror your local video or not
 				});
 
@@ -148,7 +147,7 @@
 				// When our HTML video has been added to DOM...
 				publisher.on('videoElementCreated', (event) => {
 					// Init the main video with ours and append our data
-					const userData = {
+					var userData = {
 						nickName: nickName,
 						userName: userName
 					};
@@ -179,9 +178,9 @@
 	}
 
 	function appendUserData(videoElement, connection) {
-		let clientData;
-		let serverData;
-		let nodeId;
+		var clientData;
+		var serverData;
+		var nodeId;
 		if (connection.nickName) { // Appending local video data
 			clientData = connection.nickName;
 			serverData = connection.userName;
@@ -191,7 +190,7 @@
 			serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
 			nodeId = connection.connectionId;
 		}
-		const dataNode = document.createElement('div');
+		var dataNode = document.createElement('div');
 		dataNode.className = "data-node";
 		dataNode.id = "data-" + nodeId;
 		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
@@ -200,12 +199,11 @@
 	}
 
 	function removeUserData(connection) {
-		const userNameRemoved = $("#data-" + connection.connectionId);
+		var userNameRemoved = $("#data-" + connection.connectionId);
 		if ($(userNameRemoved).find('p.userName').html() === $('#main-video p.userName').html()) {
 			cleanMainVideo(); // The participant focused in the main video has left
 		}
-
-		userNameRemoved.remove();
+		$("#data-" + connection.connectionId).remove();
 	}
 
 	function removeAllUserData() {
@@ -221,7 +219,7 @@
 
 	function addClickListener(videoElement, clientData, serverData) {
 		videoElement.addEventListener('click', function () {
-			const mainVideo = $('#main-video video').get(0);
+			var mainVideo = $('#main-video video').get(0);
 			if (mainVideo.srcObject !== videoElement.srcObject) {
 				$('#main-video').fadeOut("fast", () => {
 					$('#main-video p.nickName').html(clientData);

@@ -22,7 +22,7 @@
         </div>
         <p>
             <label for="username" class="sr-only">Username</label>
-            <input type="text" id="username" name="username" class="form-control" placeholder="Email" required
+            <input type="text" id="username" name="username" class="form-control" placeholder="Name" required
                    autofocus>
         </p>
         <p>
@@ -31,7 +31,7 @@
         </p>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
         <br>
-        <a th:href="@{/signUp}">New User?SignUp</a>
+        <a th:href="@{/signUp}" th:formaction="get">New User?SignUp</a>
     </form>
 </div>
 </body>

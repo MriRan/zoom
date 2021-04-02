@@ -1,7 +1,9 @@
 package com.mountblue.zoomclone.project.controller;
 
+import com.mountblue.zoomclone.project.serviceImplementation.UserPrincipal;
 import com.mountblue.zoomclone.project.serviceImplementation.UserServiceImplementation;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,7 @@ public class LoginController {
     private final UserServiceImplementation userService;
 
     @RequestMapping(value = "/")
-    public String logout(HttpSession httpSession) {
+    public String home(HttpSession httpSession) {
         if (checkUserLogged(httpSession)) {
             return "redirect:/dashboard";
         } else {
@@ -25,18 +27,25 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/dashboard", method = { RequestMethod.GET, RequestMethod.POST })
-    public String login(@RequestParam String user,
-                        Model model, HttpSession httpSession) {
-
+    public String dashboard(@AuthenticationPrincipal UserPrincipal principal,
+                            Model model, HttpSession httpSession) {
         String userName = (String) httpSession.getAttribute("loggedUser");
         if (userName != null) {
-            model.addAttribute("username", userName);
-        } else {
 
-            model.addAttribute("username", user);
+            model.addAttribute("username", userName);
+            return "dashboard";
         }
 
-        return "dashboard";
+        if (principal != null) {
+            httpSession.setAttribute("loggedUser", principal.getUsername());
+            model.addAttribute("username", principal.getUsername());
+            return "dashboard";
+
+        } else {
+
+            httpSession.invalidate();
+            return "redirect:/";
+        }
     }
 
     private boolean checkUserLogged(HttpSession httpSession) {

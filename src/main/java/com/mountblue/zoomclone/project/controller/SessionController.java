@@ -15,13 +15,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Controller
 public class SessionController {
 
-    private final OpenVidu openVidu;
+    private OpenVidu openVidu;
 
-    private final Map<String, Session> mapSessions = new ConcurrentHashMap<>();
-    private final Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
+    private Map<String, Session> mapSessions = new ConcurrentHashMap<>();
+    private Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
+
+    private String OPENVIDU_URL;
+    private String SECRET;
 
     public SessionController(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl) {
-        this.openVidu = new OpenVidu(openviduUrl, secret);
+        this.SECRET = secret;
+        this.OPENVIDU_URL = openviduUrl;
+        this.openVidu = new OpenVidu(OPENVIDU_URL, SECRET);
     }
 
     @RequestMapping(value = "/session", method = RequestMethod.POST)
@@ -84,7 +89,7 @@ public class SessionController {
 
     @RequestMapping(value = "/leave-session", method = RequestMethod.POST)
     public String removeUser(@RequestParam(name = "session-name") String sessionName,
-                             @RequestParam(name = "token") String token, Model model, HttpSession httpSession) throws Exception {
+                             @RequestParam(name = "token") String token, HttpSession httpSession) throws Exception {
 
         try {
             checkUserLogged(httpSession);
