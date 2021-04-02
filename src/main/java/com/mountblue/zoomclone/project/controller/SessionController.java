@@ -15,12 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Controller
 public class SessionController {
 
-    private OpenVidu openVidu;
+    private final OpenVidu openVidu;
 
-    private Map<String, Session> mapSessions = new ConcurrentHashMap<>();
-    private Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
-
+    private final Map<String, Session> mapSessions = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
     private String OPENVIDU_URL;
+    // Secret shared with our OpenVidu server
     private String SECRET;
 
     public SessionController(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl) {
@@ -51,8 +51,14 @@ public class SessionController {
             System.out.println("Existing session " + sessionName);
             try {
                 String token = this.mapSessions.get(sessionName).createConnection(connectionProperties).getToken();
+                this.mapSessionNamesTokens.get(sessionName).put(token, role);
 
-                return getString(clientData, sessionName, model, httpSession, role, token);
+                model.addAttribute("sessionName", sessionName);
+                model.addAttribute("token", token);
+                model.addAttribute("nickName", clientData);
+                model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
+
+                return "session";
 
             } catch (Exception e) {
                 model.addAttribute("username", httpSession.getAttribute("loggedUser"));
@@ -67,7 +73,14 @@ public class SessionController {
 
                 this.mapSessions.put(sessionName, session);
                 this.mapSessionNamesTokens.put(sessionName, new ConcurrentHashMap<>());
-                return getString(clientData, sessionName, model, httpSession, role, token);
+                this.mapSessionNamesTokens.get(sessionName).put(token, role);
+
+                model.addAttribute("sessionName", sessionName);
+                model.addAttribute("token", token);
+                model.addAttribute("nickName", clientData);
+                model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
+
+                return "session";
 
             } catch (Exception e) {
                 model.addAttribute("username", httpSession.getAttribute("loggedUser"));
