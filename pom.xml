@@ -7,11 +7,11 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.4.4</version>
-        <relativePath/>
     </parent>
     <groupId>com.mountblue.zoomclone</groupId>
     <artifactId>zoom-clone</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <name>zoom-clone</name>
     <description>Major Project - Zoom App Clone</description>
 
@@ -102,6 +102,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.4.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>com.mountblue.zoomclone.project.ZoomcloneApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

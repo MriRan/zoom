@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -21,22 +20,17 @@ public class Users {
 			allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,
 			generator = "user_sequence")
-	private int id;
+	private Long id;
 
 	@NotNull
 	private String name;
 
 	@NotNull
-	@Email(message = "Please provide a valid Email")
-	private String email;
-
-	@NotNull
    	@Length(min = 5, message = "Your password must have at least 5 characters")
 	private String password;
 
-	public Users(String name, String email, String password) {
+	public Users(String name,String password) {
 		this.name = name;
-		this.email = email;
 		this.password = password;
 	}
 }
