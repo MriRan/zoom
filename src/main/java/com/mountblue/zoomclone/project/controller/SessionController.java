@@ -1,9 +1,7 @@
 package com.mountblue.zoomclone.project.controller;
 
-import com.mountblue.zoomclone.project.serviceImplementation.UserPrincipal;
 import io.openvidu.java.client.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +27,7 @@ public class SessionController {
     @RequestMapping(value = "/session", method = RequestMethod.POST)
     public String joinSession(@RequestParam(name = "data") String clientData,
                               @RequestParam(name = "session-name") String sessionName,
-                              @AuthenticationPrincipal UserPrincipal principal, Model model, HttpSession httpSession) {
+                              Model model, HttpSession httpSession) {
 
         try {
             checkUserLogged(httpSession);

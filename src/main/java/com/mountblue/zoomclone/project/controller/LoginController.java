@@ -1,12 +1,12 @@
 package com.mountblue.zoomclone.project.controller;
 
-import javax.servlet.http.HttpSession;
-
 import com.mountblue.zoomclone.project.serviceImplementation.UserServiceImplementation;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @AllArgsConstructor
