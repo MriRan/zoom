@@ -1,22 +1,29 @@
-<html>
+<!DOCTYPE html>
 
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<title>Zoom App Clone</title>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"></meta>
-	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"></link>
+	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
 
 	<!-- Bootstrap -->
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+			integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+		  crossorigin="anonymous">
+
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
 			crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-		  crossorigin="anonymous"></link>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-			crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<!-- Bootstrap -->
 
-	<link rel="styleSheet" href="style.css" type="text/css" media="screen"></link>
+	<link rel="styleSheet" href="style.css" type="text/css" media="screen">
+
 	<script>
 		$(document).ready(function () {
 			$('[data-toggle="tooltip"]').tooltip({
@@ -30,23 +37,27 @@
 
 <div id="main-container" class="container">
 	<div id="not-logged" class="vertical-center">
+
+		<form th:action="@{/host-meeting}">
+			<p class="text-center">
+				<button class="btn btn-lg btn-info" type="submit">Host Meeting</button>
+			</p>
+		</form>
+
 		<form class="form-group jumbotron" action="/dashboard" method="post">
 			<p>
 				<label>Generated Link</label>
-				<input class="form-control" type="text" id="user" name="user" required="true"></input>
+
+				<label for="link">
+					<input class="form-control" type="text" id="link" name="link" th:value="${sessionName == null}?'':${'https://locathost:5000/join/'+sessionName}"
+						   placeholder="link" required>
+				</label>
+
 			</p>
-			<p>
-				<label>Password</label>
-				<input class="form-control" type="password" name="pass" required="true"></input>
-			</p>
+
 			<p class="text-center">
 				<button class="btn btn-lg btn-info" type="submit">Join Session</button>
 			</p>
-
-			<button onclick = "GenerateLink()">
-				Generate Link
-			</button>
-
 		</form>
 	</div>
 </div>
@@ -56,13 +67,6 @@
 		<div class="text-muted">Zoom App Clone</div>
 	</div>
 </footer>
-
-<script>
-	function GenerateLink() {
-		document.getElementById("user").setAttribute("value","https://localhost:5000/"+Math.floor(Math.random() * 10));
-	}
-</script>
-
 </body>
 
 </html>

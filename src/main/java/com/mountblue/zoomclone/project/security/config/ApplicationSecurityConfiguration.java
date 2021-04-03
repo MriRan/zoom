@@ -25,10 +25,10 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/css/**", "/image/**", "/", "/login", "/register", "/signUp", "/h2-console/**").permitAll()
+                .antMatchers("/css/**", "/js/**", "/*.js", "/*.css", "/image/**", "/", "/login", "/register", "/signUp", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login")
+                .formLogin().loginPage("/login").successForwardUrl("/success")
                 .and()
                 .logout().invalidateHttpSession(true)
                 .clearAuthentication(true)

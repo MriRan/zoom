@@ -17,34 +17,25 @@ public class LoginController {
     private final UserServiceImplementation userService;
 
     @RequestMapping(value = "/")
-    public String home(HttpSession httpSession) {
-        if (checkUserLogged(httpSession)) {
-            return "redirect:/dashboard";
-        } else {
-            httpSession.invalidate();
+    public String home() {
             return "index";
-        }
     }
 
     @RequestMapping(value = "/dashboard", method = { RequestMethod.GET, RequestMethod.POST })
-    public String dashboard(@AuthenticationPrincipal UserPrincipal principal,
-                            Model model, HttpSession httpSession) {
+    public String dashboard(Model model,
+                            HttpSession httpSession) {
+
         String userName = (String) httpSession.getAttribute("loggedUser");
         if (userName != null) {
 
             model.addAttribute("username", userName);
-            return "dashboard";
-        }
-
-        if (principal != null) {
-            httpSession.setAttribute("loggedUser", principal.getUsername());
-            model.addAttribute("username", principal.getUsername());
             return "dashboard";
 
         } else {
 
             httpSession.invalidate();
             return "redirect:/";
+
         }
     }
 
@@ -67,6 +58,13 @@ public class LoginController {
                            @RequestParam String password){
 
         userService.registerNewUser(name,password);
+        return "redirect:/";
+    }
+    @RequestMapping("/success")
+    public String success(@AuthenticationPrincipal UserPrincipal principal,
+                          HttpSession httpSession){
+
+        httpSession.setAttribute("loggedUser", principal.getUsername());
         return "redirect:/";
     }
 }
