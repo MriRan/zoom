@@ -45,12 +45,7 @@
 							<label>Participant</label>
 							<label>
 								<input class="form-control" type="text" name="data" required>
-							</label>
-						</p>
-						<p>
-							<label>Session</label>
-							<label>
-								<input class="form-control" type="text" name="sessionName" required>
+								<input type="hidden" name="sessionName" th:value="${sessionName}"/>
 							</label>
 						</p>
 						<p class="text-center">
@@ -58,7 +53,7 @@
 						</p>
 					</form>
 					<hr/>
-					<div id="login-info">
+					<div id="login-info" th:if="${userName != null}">
 						<div>Logged as <span th:text="${username}" id="name-user"></span></div>
 						<form action="/logout" method="post">
 							<button id="logout-btn" class="btn btn-warning" type="submit">Log out</button>
@@ -77,12 +72,4 @@
 	</footer>
 
 </body>
-
-<script>
-	window.onload = function () { // Generate participant info
-		$("input[name='session-name']").val("Session " + Math.floor(Math.random() * 10));
-		$("input[name='data']").val("Participant " + Math.floor(Math.random() * 100));
-	}
-</script>
-
 </html>

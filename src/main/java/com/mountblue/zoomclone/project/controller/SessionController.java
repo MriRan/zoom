@@ -4,11 +4,13 @@ import io.openvidu.java.client.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -25,16 +27,19 @@ public class SessionController {
         this.openVidu = new OpenVidu(openviduUrl, secret);
     }
 
+    @RequestMapping("/j/{sessionName}")
+    public String joinWithUrl(@PathVariable String sessionName,
+                              Model model){
+
+        model.addAttribute("sessionName", sessionName);
+        System.out.println(sessionName);
+        return "dashboard";
+    }
+
     @RequestMapping(value = "/session", method = RequestMethod.POST)
     public String joinSession(@RequestParam(name = "data") String clientData,
-                              @ModelAttribute String sessionName,
+                              @RequestParam String sessionName,
                               Model model, HttpSession httpSession) {
-
-        try {
-            checkUserLogged(httpSession);
-        } catch (Exception e) {
-            return "index";
-        }
 
         System.out.println("Getting sessionId and token | {sessionName}={" + sessionName + "}");
 
@@ -73,15 +78,9 @@ public class SessionController {
     }
 
     @RequestMapping(value = "/leave-session", method = RequestMethod.POST)
-    public String removeUser(@RequestParam(name = "session-name") String sessionName,
-                             @RequestParam(name = "token") String token,
-                             HttpSession httpSession) throws Exception {
+    public String removeUser(@RequestParam(name = "sessionName") String sessionName,
+                             @RequestParam(name = "token") String token) throws Exception {
 
-        try {
-            checkUserLogged(httpSession);
-        } catch (Exception e) {
-            return "index";
-        }
         System.out.println("Removing user | sessionName=" + sessionName + ", token=" + token);
 
         if (this.mapSessions.get(sessionName) != null && this.mapSessionNamesTokens.get(sessionName) != null) {
@@ -98,7 +97,7 @@ public class SessionController {
         } else {
             System.out.println("Problems in the app server: the SESSION does not exist");
         }
-        return "redirect:/dashboard";
+        return "redirect:/";
     }
 
     @RequestMapping("/host-meeting")
@@ -119,20 +118,12 @@ public class SessionController {
             this.mapSessionNamesTokens.put(sessionName, new ConcurrentHashMap<>());
             this.mapSessionNamesTokens.get(sessionName).put(token, role);
             model.addAttribute("sessionName", sessionName);
-            System.out.println(sessionName);
 
             return "index";
 
         } catch (Exception e) {
             model.addAttribute("username", httpSession.getAttribute("loggedUser"));
-            return "dashboard";
-        }
-    }
-
-
-    private void checkUserLogged(HttpSession httpSession) throws Exception {
-        if (httpSession == null || httpSession.getAttribute("loggedUser") == null) {
-            throw new Exception("User not logged");
+            return "index";
         }
     }
 

@@ -46,9 +46,11 @@
 		<div id="logged">
 			<div id="session">
 				<div id="session-header">
+					<button id="camera" onclick="new CustomEvent('videoOff', {detail: {backgroundColor: 'yellow'}});"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
+					<button id="audio"><i class="fa fa-microphone" aria-hidden="true"></i></button>
 					<h1 th:text="${sessionName}" id="session-title"></h1>
 					<form action="/leave-session" method="post">
-						<input type="hidden" name="session-name" th:value="${sessionName}"/>
+						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
 						<input type="hidden" name="token" th:value="${token}"/>
 						<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit" onclick="leaveSession()">
 							Leave session</button>
@@ -58,7 +60,7 @@
 					<p class="nickName"></p>
 					<p class="userName"></p>
 					<video autoplay="autoplay" playsinline></video>
-				</div>
+				</div>videoOff
 				<div id="video-container" class="col-md-6"></div>
 			</div>
 		</div>
@@ -160,6 +162,9 @@
 				$(event.element).prop('muted', true); // Mute local video
 			});
 
+			publisher.on('videoOff', (event)=>{
+				$(event.element).prop('publishVideo', false);
+			});
 
 			// --- 8) Publish your stream ---
 
@@ -216,6 +221,11 @@
 		$('#main-video p').each(function () {
 			$(this).html('');
 		});
+	}
+
+	function videoOnOff() {
+		Publisher.publishVideo();
+		publisher.publishVideo(false);
 	}
 
 	function addClickListener(videoElement, clientData, serverData) {

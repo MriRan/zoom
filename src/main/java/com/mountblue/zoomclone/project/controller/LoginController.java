@@ -22,25 +22,20 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/dashboard", method = { RequestMethod.GET, RequestMethod.POST })
-    public String dashboard(Model model,
+    public String dashboard(@RequestParam String sessionName,
+                            Model model,
                             HttpSession httpSession) {
 
         String userName = (String) httpSession.getAttribute("loggedUser");
+        model.addAttribute("sessionName", sessionName);
         if (userName != null) {
 
             model.addAttribute("username", userName);
-            return "dashboard";
 
         } else {
-
             httpSession.invalidate();
-            return "redirect:/";
-
         }
-    }
-
-    private boolean checkUserLogged(HttpSession httpSession) {
-        return !(httpSession == null || httpSession.getAttribute("loggedUser") == null);
+        return "dashboard";
     }
 
     @GetMapping("/login")
@@ -65,6 +60,6 @@ public class LoginController {
                           HttpSession httpSession){
 
         httpSession.setAttribute("loggedUser", principal.getUsername());
-        return "redirect:/";
+        return "index";
     }
 }
