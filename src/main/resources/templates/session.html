@@ -46,11 +46,11 @@
 		<div id="logged">
 			<div id="session">
 				<div id="session-header">
-					<button id="camera" onclick="new CustomEvent('videoOff', {detail: {backgroundColor: 'yellow'}});"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
-					<button id="audio"><i class="fa fa-microphone" aria-hidden="true"></i></button>
+					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
+					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
 					<h1 th:text="${sessionName}" id="session-title"></h1>
 					<form action="/leave-session" method="post">
-						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
+						<input type="hidden" name="session-name" th:value="${sessionName}"/>
 						<input type="hidden" name="token" th:value="${token}"/>
 						<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit" onclick="leaveSession()">
 							Leave session</button>
@@ -83,6 +83,12 @@
 	const token = [[${ token }]];
 	const nickName = [[${ nickName }]];
 	const userName = [[${ userName }]];
+
+	// var a=true;
+
+	var publisher = {};
+	var videoOn = true;
+	var audioOn = true;
 
 	console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 
@@ -129,7 +135,6 @@
 			$('#join').hide();
 			$('#session').show();
 
-
 			// Here we check somehow if the user has 'PUBLISHER' role before
 			// trying to publish its stream. Even if someone modified the client's code and
 			// published the stream, it wouldn't work if the token sent in Session.connect
@@ -137,7 +142,7 @@
 
 				// --- 6) Get your own camera stream ---
 
-			const publisher = OV.initPublisher('video-container', {
+			publisher = OV.initPublisher('video-container', {
 				audioSource: undefined, // The source of audio. If undefined default microphone
 				videoSource: undefined, // The source of video. If undefined default webcam
 				publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
@@ -162,20 +167,36 @@
 				$(event.element).prop('muted', true); // Mute local video
 			});
 
-			publisher.on('videoOff', (event)=>{
-				$(event.element).prop('publishVideo', false);
-			});
-
 			// --- 8) Publish your stream ---
 
+			// globalPublisher = publisher;
 			session.publish(publisher);
-
 
 		})
 		.catch(error => {
 			console.warn('There was an error connecting to the session:', error.code, error.message);
 		});
 
+
+	function videoOnOff() {
+		if (videoOn) {
+			videoOn = false;
+			publisher.publishVideo(false);
+		} else {
+			videoOn = true;
+			publisher.publishVideo(true);
+		}
+	}
+
+	function audioOnOff() {
+		if (audioOn) {
+			audioOn = false;
+			publisher.publishAudio(false);
+		} else {
+			audioOn = true;
+			publisher.publishAudio(true);
+		}
+	}
 
 	function leaveSession() {
 
@@ -221,11 +242,6 @@
 		$('#main-video p').each(function () {
 			$(this).html('');
 		});
-	}
-
-	function videoOnOff() {
-		Publisher.publishVideo();
-		publisher.publishVideo(false);
 	}
 
 	function addClickListener(videoElement, clientData, serverData) {
