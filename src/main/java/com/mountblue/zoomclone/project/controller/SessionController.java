@@ -50,34 +50,24 @@ public class SessionController {
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC)
                 .role(role).data(serverData).build();
 
-        if (this.mapSessions.get(sessionName) != null) {
             System.out.println("Existing session " + sessionName);
             try {
                 String token = this.mapSessions.get(sessionName).createConnection(connectionProperties).getToken();
                 allParticipant.get(sessionName).add(clientData);
                 model.addAttribute("allParticipant", allParticipant.get(sessionName));
                 System.out.println(allParticipant.get(sessionName));
-                return setModelAttributeForSession(clientData, sessionName, model, httpSession, role, token);
 
+                this.mapSessionNamesTokens.get(sessionName).put(token, role);
+                model.addAttribute("sessionName", sessionName);
+                model.addAttribute("token", token);
+                model.addAttribute("nickName", clientData);
+                model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
+
+                return "session";
             } catch (Exception e) {
                 model.addAttribute("username", httpSession.getAttribute("loggedUser"));
                 return "dashboard";
             }
-        } else {
-            System.out.println("New session " + sessionName);
-            try {
-
-                Session session = this.openVidu.createSession();
-                String token = session.createConnection(connectionProperties).getToken();
-                this.mapSessions.put(sessionName, session);
-                this.mapSessionNamesTokens.put(sessionName, new ConcurrentHashMap<>());
-                return setModelAttributeForSession(clientData, sessionName, model, httpSession, role, token);
-
-            } catch (Exception e) {
-                model.addAttribute("username", httpSession.getAttribute("loggedUser"));
-                return "dashboard";
-            }
-        }
     }
 
     @RequestMapping(value = "/leave-session", method = RequestMethod.POST)
@@ -131,21 +121,6 @@ public class SessionController {
             model.addAttribute("username", httpSession.getAttribute("loggedUser"));
             return "index";
         }
-    }
-
-    private String setModelAttributeForSession(@RequestParam(name = "data") String clientData,
-                                               @RequestParam(name = "session-name") String sessionName,
-                                               Model model, HttpSession httpSession,
-                                               OpenViduRole role,
-                                               String token) {
-
-        this.mapSessionNamesTokens.get(sessionName).put(token, role);
-        model.addAttribute("sessionName", sessionName);
-        model.addAttribute("token", token);
-        model.addAttribute("nickName", clientData);
-        model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
-
-        return "session";
     }
 
     private String getRandomChars() {
