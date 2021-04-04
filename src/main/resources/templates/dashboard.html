@@ -25,12 +25,11 @@
 	<div id="main-container" class="container">
 		<div id="logged">
 			<div id="join" class="vertical-center">
-				<div id="img-div"><img src="images/openvidu_grey_bg_transp_cropped.png"  alt=""/></div>
 				<div id="join-dialog" class="jumbotron">
-					<h1>Join a video session</h1>
+					<p><h1>Join Meeting</h1></p>
 					<form class="form-group" action="/session" method="post">
 						<p>
-							<label>Participant</label>
+							<label>Name</label>
 							<label>
 								<input class="form-control" type="text" name="data" required>
 								<input type="hidden" name="sessionName" th:value="${sessionName}"/>

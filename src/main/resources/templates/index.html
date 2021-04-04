@@ -23,21 +23,12 @@
 	<!-- Bootstrap -->
 
 	<link rel="styleSheet" href="style.css" type="text/css" media="screen">
-
-	<script>
-		$(document).ready(function () {
-			$('[data-toggle="tooltip"]').tooltip({
-				html: true
-			});
-		});
-	</script>
 </head>
 
 <body>
 
 <div id="main-container" class="container">
 	<div id="not-logged" class="vertical-center">
-
 		<form th:action="@{/host-meeting}">
 			<p class="text-center">
 				<button class="btn btn-lg btn-info" type="submit">Host Meeting</button>
@@ -46,11 +37,12 @@
 
 		<form class="form-group jumbotron" action="/dashboard" method="post">
 			<p>
-				<label>Generated Link</label>
+				<label>Link</label>
 
 				<label for="link">
-					<input class="form-control" type="text" id="link" name="link" th:value="${sessionName == null}?'':${'https://localhost:5000/j/'+sessionName}"
-						   placeholder="link" required>
+					<input class="form-control" type="text" id="link" name="link"
+						   th:value="${sessionName == null}?'':${'https://localhost:5000/j/'+sessionName}"
+						   placeholder="Link" required>
 				</label>
 
 			</p>
@@ -58,14 +50,10 @@
 				<button class="btn btn-lg btn-info" type="submit">Join Session</button>
 			</p>
 		</form>
+
 	</div>
 </div>
 
-<footer class="footer">
-	<div class="container">
-		<div class="text-muted">Zoom App Clone</div>
-	</div>
-</footer>
 </body>
 
 </html>
