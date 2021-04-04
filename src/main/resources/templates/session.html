@@ -32,7 +32,7 @@
 				<div id="session-header">
 					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
 					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
-					<h1 th:text="${sessionName}" id="session-title"></h1>
+<!--					<h1 th:text="${sessionName}" id="session-title"></h1>-->
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
 						<input type="hidden" name="nickName" th:value="${nickName}"/>
@@ -41,12 +41,12 @@
 							Leave session</button>
 					</form>
 				</div>
-				<div id="main-video" class="col-md-6">
+				<div id="video-container" class="col-md-6"></div>
+				<div id="main-video" class="col-sm-12">
 					<p class="nickName"></p>
 					<p class="userName"></p>
 					<video autoplay="autoplay" playsinline></video>
 				</div>
-				<div id="video-container" class="col-md-6"></div>
 			</div>
 		</div>
 	</div>
