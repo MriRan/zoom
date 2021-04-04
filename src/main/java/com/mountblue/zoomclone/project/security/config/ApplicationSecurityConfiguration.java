@@ -25,8 +25,8 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/css/**", "/js/**", "/*.js", "/*.css", "/image/**", "/", "/login", "/register", "/signUp", "/h2-console/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/host-meeting").authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .formLogin().loginPage("/login").successForwardUrl("/success")
                 .and()
