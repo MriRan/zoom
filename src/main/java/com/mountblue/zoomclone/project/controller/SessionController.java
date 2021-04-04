@@ -4,10 +4,7 @@ import io.openvidu.java.client.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -85,15 +82,17 @@ public class SessionController {
 
     @RequestMapping(value = "/leave-session", method = RequestMethod.POST)
     public String removeUser(@RequestParam(name = "sessionName") String sessionName,
-                             @RequestParam(name = "token") String token) throws Exception {
+                             @RequestParam(name = "token") String token,
+                             @RequestParam String nickName) throws Exception {
 
         System.out.println("Removing user | sessionName=" + sessionName + ", token=" + token);
 
         if (this.mapSessions.get(sessionName) != null && this.mapSessionNamesTokens.get(sessionName) != null) {
+            this.allParticipant.get(sessionName).remove(nickName);
+            System.out.println(allParticipant.get(sessionName));
 
             if (this.mapSessionNamesTokens.get(sessionName).remove(token) != null) {
                 if (this.mapSessionNamesTokens.get(sessionName).isEmpty()) {
-//                    this.allParticipant.get(sessionName).remove()
                     this.mapSessions.remove(sessionName);
                 }
 
