@@ -32,6 +32,7 @@
 				<div id="session-header">
 					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
 					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
+					<button id="share"  type="submit" onclick="shareScreen()"><i class="btn fa fs-upload"></i></button>
 					<h1 th:text="${sessionName}" id="session-title"></h1>
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
@@ -177,6 +178,30 @@
 
 		// --- 9) Leave the session by calling 'disconnect' method over the Session object ---
 		session.disconnect();
+	}
+
+	function shareScreen() {
+
+		var userData = {
+			nickName: nickName,
+			userName: userName
+		};
+
+		session.unpublish(publisher);
+		publisher = OV.initPublisher('video-container', { videoSource: "screen" });
+
+		publisher.once('accessAllowed', (event) => {
+			publisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+				console.log('User pressed the "Stop sharing" button');
+			});
+			sessionScreen.publish(publisher);
+
+		});
+
+		publisher.once('accessDenied', (event) => {
+			console.warn('ScreenShare: Access Denied');
+		});
+		session.publish(publisher);
 	}
 
 	function appendUserData(videoElement, connection) {
