@@ -52,9 +52,6 @@
 					<input class="form-control" type="text" id="link" name="link" th:value="${sessionName == null}?'':${'https://localhost:5000/j/'+sessionName}"
 						   placeholder="link" required>
 				</label>
-				<label>
-					<input type="hidden" name="sessionName" th:value="${sessionName}"/>
-				</label>
 
 			</p>
 			<p class="text-center">

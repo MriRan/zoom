@@ -32,7 +32,6 @@
 				<div id="session-header">
 					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
 					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
-<!--					<h1 th:text="${sessionName}" id="session-title"></h1>-->
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
 						<input type="hidden" name="nickName" th:value="${nickName}"/>
