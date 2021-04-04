@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,6 +23,7 @@ public class SessionController {
 
     private final Map<String, Session> mapSessions = new ConcurrentHashMap<>();
     private final Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
+    private final Map<String, List<String>> allParticipant = new LinkedHashMap<>();
 
     public SessionController(@Value("${openvidu.secret}") String secret,
                              @Value("${openvidu.url}") String openviduUrl) {
@@ -52,8 +56,10 @@ public class SessionController {
         if (this.mapSessions.get(sessionName) != null) {
             System.out.println("Existing session " + sessionName);
             try {
-
                 String token = this.mapSessions.get(sessionName).createConnection(connectionProperties).getToken();
+                allParticipant.get(sessionName).add(clientData);
+                model.addAttribute("allParticipant", allParticipant.get(sessionName));
+                System.out.println(allParticipant.get(sessionName));
                 return setModelAttributeForSession(clientData, sessionName, model, httpSession, role, token);
 
             } catch (Exception e) {
@@ -87,6 +93,7 @@ public class SessionController {
 
             if (this.mapSessionNamesTokens.get(sessionName).remove(token) != null) {
                 if (this.mapSessionNamesTokens.get(sessionName).isEmpty()) {
+//                    this.allParticipant.get(sessionName).remove()
                     this.mapSessions.remove(sessionName);
                 }
 
@@ -111,13 +118,13 @@ public class SessionController {
         String sessionName = getRandomChars();
 
         try {
-
             Session session = this.openVidu.createSession();
             String token = session.createConnection(connectionProperties).getToken();
             this.mapSessions.put(sessionName, session);
             this.mapSessionNamesTokens.put(sessionName, new ConcurrentHashMap<>());
             this.mapSessionNamesTokens.get(sessionName).put(token, role);
             model.addAttribute("sessionName", sessionName);
+            allParticipant.put(sessionName, new ArrayList<>());
 
             return "index";
 
