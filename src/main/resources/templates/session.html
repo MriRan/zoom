@@ -33,6 +33,7 @@
 					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
 					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
 					<button id="share"  type="submit" onclick="shareScreen()"><i class="btn fa fs-upload"></i></button>
+					<button id="endshare"  type="submit" onclick="shareEnd()"><i class="btn fa fs-upload"></i></button>
 					<h1 th:text="${sessionName}" id="session-title"></h1>
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
@@ -203,6 +204,10 @@
 			console.warn('ScreenShare: Access Denied');
 		});
 		session.publish(publisher);
+	}
+
+	function shareEnd(){
+
 	}
 
 	function appendUserData(videoElement, connection) {
