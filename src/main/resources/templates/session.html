@@ -81,12 +81,12 @@
 	const nickName = [[${ nickName }]];
 	const userName = [[${ userName }]];
 
-	var publisher = {};
-	var videoOn = true;
-	var audioOn = true;
-	var participant = [];
+	let publisher = {};
+	let videoOn = true;
+	let audioOn = true;
+	let participant = [];
 
-	var abc = true;
+	let abc = true;
 
 	console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 
@@ -94,8 +94,6 @@
 
 	session = OV.initSession();
 
-	// --- 3) Specify the actions when events take place in the session ---
-    // chat message implementation
 	function buttonAction()
 	{
 		var chatVal = document.getElementById("chatIn").value;
@@ -120,7 +118,6 @@
 		myTextArea.val(myTextArea.val()+ '\n' + event.data );
 	});
 
-	// On every new Stream received...
 	session.on('streamCreated', (event) => {
 
 		const subscriber = session.subscribe(event.stream, 'video-container');
@@ -151,6 +148,7 @@
 				mirror: false
 			});
 
+			abc = true;
 			publisher.on('videoElementCreated', (event) => {
 				const userData = {
 					nickName: nickName,
@@ -221,6 +219,7 @@
 
 	function shareScreen() {
 
+		abc = false;
 		var userData = {
 			nickName: nickName,
 			userName: userName
@@ -246,6 +245,7 @@
 
 	function shareEnd(){
 
+		abc = false;
 		session.unpublish(publisher);
 		publisher = OV.initPublisher('video-container', {
 			audioSource: undefined,
@@ -288,7 +288,9 @@
 		dataNode.id = "data-" + nodeId;
 		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p>';
 		videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
-		participant.push(clientData);
+		if (abc) {
+			participant.push(clientData);
+		}
 		addClickListener(videoElement, clientData, serverData);
 	}
 
