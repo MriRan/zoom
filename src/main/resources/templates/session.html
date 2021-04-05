@@ -88,7 +88,21 @@
     // chat message implementation
 	function buttonAction()
 	{
+		var chatVal = document.getElementById("chatIn").value;
 
+		session.signal({
+			data: nickName  + " : "+ chatVal,  // Any string (optional)
+			to: [],                     // Array of Connection objects (optional. Broadcast to everyone if empty)
+			type: 'my-chat'             // The type of message (optional)
+		})
+				.then(() => {
+					console.log('Message successfully sent');
+				})
+				.catch(error => {
+					console.error(error);
+				});
+
+	}
 
 	session.on('signal:my-chat', (event) => {
 		var myTextArea = $('#chatBox');
