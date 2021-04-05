@@ -56,9 +56,7 @@
 							</form>
 							<button type="button" onclick="buttonAction()">Chat</button>
 							<input id="chatIn" type="text" name="chatI">
-
-							<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly>
-				</textarea>
+							<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly></textarea>
 						</div>
 					</div>
 					<div class="w3-container">
@@ -103,9 +101,9 @@
 		var chatVal = document.getElementById("chatIn").value;
 
 		session.signal({
-			data: nickName  + " : "+ chatVal,  // Any string (optional)
-			to: [],                     // Array of Connection objects (optional. Broadcast to everyone if empty)
-			type: 'my-chat'             // The type of message (optional)
+			data: nickName  + " : "+ chatVal,
+			to: [],
+			type: 'my-chat'
 		})
 				.then(() => {
 					console.log('Message successfully sent');
