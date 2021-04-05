@@ -54,6 +54,11 @@
 									<i class="fa fa-sign-out" aria-hidden="true"></i>
 								</button>
 							</form>
+							<button type="button" onclick="buttonAction()">Chat</button>
+							<input id="chatIn" type="text" name="chatI">
+
+							<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly>
+				</textarea>
 						</div>
 					</div>
 					<div class="w3-container">
@@ -91,6 +96,33 @@
 
 	session = OV.initSession();
 
+	// --- 3) Specify the actions when events take place in the session ---
+    // chat message implementation
+	function buttonAction()
+	{
+		var chatVal = document.getElementById("chatIn").value;
+
+		session.signal({
+			data: nickName  + " : "+ chatVal,  // Any string (optional)
+			to: [],                     // Array of Connection objects (optional. Broadcast to everyone if empty)
+			type: 'my-chat'             // The type of message (optional)
+		})
+				.then(() => {
+					console.log('Message successfully sent');
+				})
+				.catch(error => {
+					console.error(error);
+				});
+
+	}
+
+	session.on('signal:my-chat', (event) => {
+		var myTextArea = $('#chatBox');
+
+		myTextArea.val(myTextArea.val()+ '\n' + event.data );
+	});
+
+	// On every new Stream received...
 	session.on('streamCreated', (event) => {
 
 		const subscriber = session.subscribe(event.stream, 'video-container');
