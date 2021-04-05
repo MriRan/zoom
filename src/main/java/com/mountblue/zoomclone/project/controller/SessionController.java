@@ -20,7 +20,6 @@ public class SessionController {
 
     private final Map<String, Session> mapSessions = new ConcurrentHashMap<>();
     private final Map<String, Map<String, OpenViduRole>> mapSessionNamesTokens = new ConcurrentHashMap<>();
-    private final Map<String, List<String>> allParticipant = new LinkedHashMap<>();
 
     public SessionController(@Value("${openvidu.secret}") String secret,
                              @Value("${openvidu.url}") String openviduUrl) {
@@ -53,9 +52,6 @@ public class SessionController {
             System.out.println("Existing session " + sessionName);
             try {
                 String token = this.mapSessions.get(sessionName).createConnection(connectionProperties).getToken();
-                allParticipant.get(sessionName).add(clientData);
-                model.addAttribute("allParticipant", allParticipant.get(sessionName));
-                System.out.println(allParticipant.get(sessionName));
 
                 this.mapSessionNamesTokens.get(sessionName).put(token, role);
                 model.addAttribute("sessionName", sessionName);
@@ -72,14 +68,11 @@ public class SessionController {
 
     @RequestMapping(value = "/leave-session", method = RequestMethod.POST)
     public String removeUser(@RequestParam(name = "sessionName") String sessionName,
-                             @RequestParam(name = "token") String token,
-                             @RequestParam String nickName) throws Exception {
+                             @RequestParam(name = "token") String token) throws Exception {
 
         System.out.println("Removing user | sessionName=" + sessionName + ", token=" + token);
 
         if (this.mapSessions.get(sessionName) != null && this.mapSessionNamesTokens.get(sessionName) != null) {
-            this.allParticipant.get(sessionName).remove(nickName);
-            System.out.println(allParticipant.get(sessionName));
 
             if (this.mapSessionNamesTokens.get(sessionName).remove(token) != null) {
                 if (this.mapSessionNamesTokens.get(sessionName).isEmpty()) {
@@ -113,7 +106,6 @@ public class SessionController {
             this.mapSessionNamesTokens.put(sessionName, new ConcurrentHashMap<>());
             this.mapSessionNamesTokens.get(sessionName).put(token, role);
             model.addAttribute("sessionName", sessionName);
-            allParticipant.put(sessionName, new ArrayList<>());
 
             return "index";
 

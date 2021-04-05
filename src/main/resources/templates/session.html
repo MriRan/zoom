@@ -32,7 +32,7 @@
 		<button class="w3-bar-item w3-button w3-large"
 				onclick="sidebarClose()">Close &times;</button>
 		Participants
-		<li class="w3-bar-item" id="listParticipants"></li>
+		<div class="w3-bar-item" id="listParticipants"></div>
 	</div>
 
 	<div id="main">
@@ -46,7 +46,6 @@
 							<button id="audio" onclick="audioOnOff()"><i id="micIcon" class="fa fa-microphone" style="color: red" aria-hidden="true"></i></button>
 							<form action="/leave-session" method="post">
 								<input type="hidden" name="sessionName" th:value="${sessionName}"/>
-								<input type="hidden" name="nickName" th:value="${nickName}"/>
 								<input type="hidden" name="token" th:value="${token}"/>
 								<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit" onclick="leaveSession()">
 									<i class="fa fa-sign-out" aria-hidden="true"></i>
@@ -58,7 +57,6 @@
 						<div class="col-sm-3"></div>
 						<div id="main-video" class="col-sm-6">
 							<p class="nickName"></p>
-<!--							<p class="userName"></p>-->
 							<video autoplay="autoplay" playsinline></video>
 						</div>
 						<div class="col-sm-3"></div>
@@ -80,6 +78,9 @@
 	var publisher = {};
 	var videoOn = true;
 	var audioOn = true;
+	var participant = [];
+
+	var abc = true;
 
 	console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 
@@ -163,9 +164,12 @@
 		document.getElementById("sidebar").style.width = "15%";
 		document.getElementById("sidebar").style.display = "block";
 		document.getElementById("openNav").style.display = 'none';
-		document.getElementById("listParticipants").innerHTML = '<li th:each="participant: ${allParticipant}" th:value="participant" th:text="${participant}"></li>';
-		console.log([[${allParticipant}]])
+		document.getElementById("listParticipants").innerHTML = null;
+		participant.forEach((item, index) => {
+			document.getElementById("listParticipants").innerHTML += '<li>'+item+'</li>';
+		});
 	}
+
 	function sidebarClose() {
 		document.getElementById("main").style.marginLeft = "0%";
 		document.getElementById("sidebar").style.display = "none";
@@ -173,6 +177,12 @@
 	}
 
 	function leaveSession() {
+		participant.forEach((item, index) => {
+			if (item === nickName) {
+				participant.splice(index);
+				return;
+			}
+		});
 		session.disconnect();
 	}
 
@@ -194,6 +204,7 @@
 		dataNode.id = "data-" + nodeId;
 		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p>';
 		videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
+		participant.push(clientData);
 		addClickListener(videoElement, clientData, serverData);
 	}
 
