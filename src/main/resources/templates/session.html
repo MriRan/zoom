@@ -186,7 +186,8 @@
 			nickName: nickName,
 			userName: userName
 		};
-
+		removeUserData(userData);
+		cleanMainVideo();
 		session.unpublish(publisher);
 		publisher = OV.initPublisher('video-container', { videoSource: "screen" });
 
