@@ -7,9 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,7 +29,7 @@ public class SessionController {
                               Model model){
 
         model.addAttribute("sessionName", sessionName);
-        System.out.println(sessionName);
+        model.addAttribute("userName", "Guest");
         return "dashboard";
     }
 
@@ -51,6 +48,7 @@ public class SessionController {
 
             System.out.println("Existing session " + sessionName);
             try {
+
                 String token = this.mapSessions.get(sessionName).createConnection(connectionProperties).getToken();
 
                 this.mapSessionNamesTokens.get(sessionName).put(token, role);
@@ -60,6 +58,7 @@ public class SessionController {
                 model.addAttribute("userName", httpSession.getAttribute("loggedUser"));
 
                 return "session";
+
             } catch (Exception e) {
                 model.addAttribute("username", httpSession.getAttribute("loggedUser"));
                 return "dashboard";
