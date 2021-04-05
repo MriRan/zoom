@@ -86,7 +86,15 @@
 
 	// --- 3) Specify the actions when events take place in the session ---
     // chat message implementation
+	function buttonAction()
+	{
 
+
+	session.on('signal:my-chat', (event) => {
+		var myTextArea = $('#chatBox');
+
+		myTextArea.val(myTextArea.val()+ '\n' + event.data );
+	});
 
 	// On every new Stream received...
 	session.on('streamCreated', (event) => {
