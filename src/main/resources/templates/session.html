@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th = "http://www.thymeleaf.org">
 
 <head>
-	<title>openvidu-mvc-java</title>
+	<title>Zoom App Clone</title>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
 
@@ -13,6 +13,8 @@
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 		  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
 			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
@@ -26,29 +28,40 @@
 
 <body>
 
-	<div id="main-container" class="container">
-		<div id="logged">
-			<div id="session">
-				<div id="session-header">
-					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
-					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
-					<button id="share"  type="submit" onclick="shareScreen()"><i class="btn fa fs-upload"></i></button>
-					<button id="shareEnd" class="btn btn-large btn-danger" type="submit" onclick="shareEnd()">
-						End Share </button>
-					<h1 th:text="${sessionName}" id="session-title"></h1>
-					<form action="/leave-session" method="post">
-						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
-						<input type="hidden" name="nickName" th:value="${nickName}"/>
-						<input type="hidden" name="token" th:value="${token}"/>
-						<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit" onclick="leaveSession()">
-							Leave session</button>
-					</form>
-				</div>
-				<div id="video-container" class="col-md-6"></div>
-				<div id="main-video" class="col-sm-12">
-					<p class="nickName"></p>
-					<p class="userName"></p>
-					<video autoplay="autoplay" playsinline></video>
+	<div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="sidebar">
+		<button class="w3-bar-item w3-button w3-large"
+				onclick="sidebarClose()">Close &times;</button>
+		Participants
+		<div class="w3-bar-item" id="listParticipants"></div>
+	</div>
+
+	<div id="main">
+		<div id="main-container" class="container">
+			<div id="logged">
+				<div id="session">
+					<div class="w3-dark-grey" id="session-header">
+						<div class="w3-container">
+							<button id="openNav" class="w3-button w3-light-grey w3-large" onclick="sidebarOpen()"><i class="fa fa-users" aria-hidden="true"></i></button>
+							<button id="camera" onclick="videoOnOff()"><i id="camIcon" class="fa fa-video-camera" style="color: red"></i></button>
+							<button id="audio" onclick="audioOnOff()"><i id="micIcon" class="fa fa-microphone" style="color: red" aria-hidden="true"></i></button>
+							<form action="/leave-session" method="post">
+								<input type="hidden" name="sessionName" th:value="${sessionName}"/>
+								<input type="hidden" name="token" th:value="${token}"/>
+								<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit" onclick="leaveSession()">
+									<i class="fa fa-sign-out" aria-hidden="true"></i>
+								</button>
+							</form>
+						</div>
+					</div>
+					<div class="w3-container">
+						<div class="col-sm-3"></div>
+						<div id="main-video" class="col-sm-6">
+							<p class="nickName"></p>
+							<video autoplay="autoplay" playsinline></video>
+						</div>
+						<div class="col-sm-3"></div>
+						<div id="video-container" class="col-md-6"></div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -62,92 +75,59 @@
 	const nickName = [[${ nickName }]];
 	const userName = [[${ userName }]];
 
-	// var a=true;
-
 	var publisher = {};
 	var videoOn = true;
 	var audioOn = true;
+	var participant = [];
+
+	var abc = true;
 
 	console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 
-	// --- 1) Get an OpenVidu object ---
-
 	OV = new OpenVidu();
-
-	// --- 2) Init a session ---
 
 	session = OV.initSession();
 
-	// --- 3) Specify the actions when events take place in the session ---
-
-	// On every new Stream received...
 	session.on('streamCreated', (event) => {
 
-		// Subscribe to the Stream to receive it
-		// HTML video will be appended to element with 'video-container' id
 		const subscriber = session.subscribe(event.stream, 'video-container');
 
-		// When the HTML video has been appended to DOM...
 		subscriber.on('videoElementCreated', (event) => {
-
-			// Add a new HTML element for the user's name and nickname over its video
 			appendUserData(event.element, subscriber.stream.connection);
 		});
 	});
 
-	// On every Stream destroyed...
 	session.on('streamDestroyed', (event) => {
-		// Delete the HTML element with the user's name and nickname
 		removeUserData(event.stream.connection);
 	});
-
-	// --- 4) Connect to the session passing the retrieved token and some more data from
-	//        the client (in this case a JSON with the nickname chosen by the user) ---
-
 	session.connect(token, { clientData: nickName })
 		.then(() => {
-
-			// --- 5) Set page layout for active call ---
 
 			$('#session-title').text(sessionName);
 			$('#join').hide();
 			$('#session').show();
 
-			// Here we check somehow if the user has 'PUBLISHER' role before
-			// trying to publish its stream. Even if someone modified the client's code and
-			// published the stream, it wouldn't work if the token sent in Session.connect
-			// method is not recognized as 'PUBLIHSER' role by OpenVidu Server
-
-				// --- 6) Get your own camera stream ---
-
 			publisher = OV.initPublisher('video-container', {
-				audioSource: undefined, // The source of audio. If undefined default microphone
-				videoSource: undefined, // The source of video. If undefined default webcam
-				publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
-				publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
-				resolution: '640x480',  // The resolution of your video
-				frameRate: 30,			// The frame rate of your video
-				insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
-				mirror: false       	// Whether to mirror your local video or not
+				audioSource: undefined,
+				videoSource: undefined,
+				publishAudio: true,
+				publishVideo: true,
+				resolution: '640x480',
+				frameRate: 30,
+				insertMode: 'APPEND',
+				mirror: false
 			});
 
-			// --- 7) Specify the actions when events take place in our publisher ---
-
-			// When our HTML video has been added to DOM...
 			publisher.on('videoElementCreated', (event) => {
-				// Init the main video with ours and append our data
 				const userData = {
 					nickName: nickName,
 					userName: userName
 				};
 				initMainVideo(event.element, userData);
 				appendUserData(event.element, userData);
-				$(event.element).prop('muted', true); // Mute local video
+				$(event.element).prop('muted', true);
 			});
 
-			// --- 8) Publish your stream ---
-
-			// globalPublisher = publisher;
 			session.publish(publisher);
 
 		})
@@ -155,14 +135,15 @@
 			console.warn('There was an error connecting to the session:', error.code, error.message);
 		});
 
-
 	function videoOnOff() {
 		if (videoOn) {
 			videoOn = false;
 			publisher.publishVideo(false);
+			document.getElementById("camIcon").style = "color: black";
 		} else {
 			videoOn = true;
 			publisher.publishVideo(true);
+			document.getElementById("camIcon").style = "color: red";
 		}
 	}
 
@@ -170,15 +151,38 @@
 		if (audioOn) {
 			audioOn = false;
 			publisher.publishAudio(false);
+			document.getElementById("micIcon").style = "color: black";
 		} else {
 			audioOn = true;
 			publisher.publishAudio(true);
+			document.getElementById("micIcon").style = "color: red";
 		}
 	}
 
-	function leaveSession() {
+	function sidebarOpen() {
+		document.getElementById("main").style.marginLeft = "10%";
+		document.getElementById("sidebar").style.width = "15%";
+		document.getElementById("sidebar").style.display = "block";
+		document.getElementById("openNav").style.display = 'none';
+		document.getElementById("listParticipants").innerHTML = null;
+		participant.forEach((item, index) => {
+			document.getElementById("listParticipants").innerHTML += '<li>'+item+'</li>';
+		});
+	}
 
-		// --- 9) Leave the session by calling 'disconnect' method over the Session object ---
+	function sidebarClose() {
+		document.getElementById("main").style.marginLeft = "0%";
+		document.getElementById("sidebar").style.display = "none";
+		document.getElementById("openNav").style.display = "inline-block";
+	}
+
+	function leaveSession() {
+		participant.forEach((item, index) => {
+			if (item === nickName) {
+				participant.splice(index);
+				return;
+			}
+		});
 		session.disconnect();
 	}
 
@@ -245,7 +249,7 @@
 		let clientData;
 		let serverData;
 		let nodeId;
-		if (connection.nickName) { // Appending local video data
+		if (connection.nickName) {
 			clientData = connection.nickName;
 			serverData = connection.userName;
 			nodeId = 'main-videodata';
@@ -257,15 +261,16 @@
 		const dataNode = document.createElement('div');
 		dataNode.className = "data-node";
 		dataNode.id = "data-" + nodeId;
-		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
+		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p>';
 		videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
+		participant.push(clientData);
 		addClickListener(videoElement, clientData, serverData);
 	}
 
 	function removeUserData(connection) {
 		const userNameRemoved = $("#data-" + connection.connectionId);
 		if ($(userNameRemoved).find('p.userName').html() === $('#main-video p.userName').html()) {
-			cleanMainVideo(); // The participant focused in the main video has left
+			cleanMainVideo();
 		}
 		$("#data-" + connection.connectionId).remove();
 	}
@@ -301,11 +306,6 @@
 		$('#main-video p.userName').html(userData.userName);
 		$('#main-video video').prop('muted', true);
 	}
-
-	function initMainVideoThumbnail() {
-		$('#main-video video').css("background", "url('images/subscriber-msg.jpg') round");
-	}
-
 </script>
 
 </html>

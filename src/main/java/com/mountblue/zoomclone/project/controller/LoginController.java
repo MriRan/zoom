@@ -21,23 +21,6 @@ public class LoginController {
             return "index";
     }
 
-    @RequestMapping(value = "/dashboard", method = { RequestMethod.GET, RequestMethod.POST })
-    public String dashboard(@RequestParam String sessionName,
-                            Model model,
-                            HttpSession httpSession) {
-
-        String userName = (String) httpSession.getAttribute("loggedUser");
-        model.addAttribute("sessionName", sessionName);
-        if (userName != null) {
-
-            model.addAttribute("username", userName);
-
-        } else {
-            httpSession.invalidate();
-        }
-        return "dashboard";
-    }
-
     @GetMapping("/login")
     public String login(){
         return "login";
