@@ -43,6 +43,12 @@
 						<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit" onclick="leaveSession()">
 							Leave session</button>
 					</form>
+					// chat message part
+					<button type="button" onclick="buttonAction()">Chat</button>
+					<input id="chatIn" type="text" name="chatI">
+
+					<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly>
+				</textarea>
 				</div>
 				<div id="main-video" class="col-md-6">
 					<p class="nickName"></p>
@@ -79,6 +85,8 @@
 	session = OV.initSession();
 
 	// --- 3) Specify the actions when events take place in the session ---
+    // chat message implementation
+
 
 	// On every new Stream received...
 	session.on('streamCreated', (event) => {
