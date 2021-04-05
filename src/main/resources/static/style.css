@@ -31,6 +31,7 @@ nav i.fa {
 	color: #ccc;
 }
 
+
 nav a:hover {
 	color: #a9a9a9 !important;
 }
@@ -343,7 +344,6 @@ table i {
 #name-user {
 	font-weight: bold;
 }
-
 
 /* xs ans md screen resolutions*/
 
