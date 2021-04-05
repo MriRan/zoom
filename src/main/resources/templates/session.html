@@ -30,7 +30,7 @@
 		<div id="logged">
 			<div id="session">
 				<div id="session-header">
-					<button id="camera" onclick="videoOnOff()"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
+					<button id="camera" onclick="videoOnOff()"><i id="cam" class="fa fa-video-camera" aria-hidden="true"></i></button>
 					<button id="audio" onclick="audioOnOff()"><i class="fa fa-microphone" aria-hidden="true"></i></button>
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionName" th:value="${sessionName}"/>
@@ -57,6 +57,7 @@
 	const token = [[${ token }]];
 	const nickName = [[${ nickName }]];
 	const userName = [[${ userName }]];
+	let participants = [];
 
 	// var a=true;
 
@@ -145,7 +146,6 @@
 
 			// globalPublisher = publisher;
 			session.publish(publisher);
-
 		})
 		.catch(error => {
 			console.warn('There was an error connecting to the session:', error.code, error.message);
@@ -196,6 +196,7 @@
 		dataNode.id = "data-" + nodeId;
 		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
 		videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
+		participants.push(clientData)
 		addClickListener(videoElement, clientData, serverData);
 	}
 
@@ -242,6 +243,7 @@
 	function initMainVideoThumbnail() {
 		$('#main-video video').css("background", "url('images/subscriber-msg.jpg') round");
 	}
+
 
 </script>
 

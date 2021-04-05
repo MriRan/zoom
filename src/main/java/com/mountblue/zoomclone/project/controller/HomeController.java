@@ -18,6 +18,7 @@ public class HomeController {
                             HttpSession httpSession) {
 
         String userName = (String) httpSession.getAttribute("loggedUser");
+        System.out.println(userName);
         String sessionName = link.substring(link.length()-6);
         model.addAttribute("sessionName", sessionName);
         if (userName != null) {

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th = "http://www.thymeleaf.org">
 
 <head>
-	<title>openvidu-mvc-java</title>
+	<title>Zoom</title>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
 
@@ -26,7 +26,7 @@
 		<div id="logged">
 			<div id="join" class="vertical-center">
 				<div id="join-dialog" class="jumbotron">
-					<p><h1>Join Meeting</h1></p>
+					<p><h1>Join Meeting</h1>
 					<form class="form-group" action="/session" method="post">
 						<p>
 							<label>Name</label>
@@ -39,13 +39,6 @@
 							<button class="btn btn-lg btn-success" type="submit">Join!</button>
 						</p>
 					</form>
-					<hr/>
-					<div id="login-info" th:if="${userName != null}">
-						<div>Logged as <span th:text="${username}" id="name-user"></span></div>
-						<form action="/logout" method="post">
-							<button id="logout-btn" class="btn btn-warning" type="submit">Log out</button>
-						</form>
-					</div>
 				</div>
 			</div>
 		</div>
