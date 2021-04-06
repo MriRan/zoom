@@ -35,18 +35,25 @@
 		<div class="w3-bar-item" id="listParticipants"></div>
 	</div>
 
+	<div class="w3-sidebar w3-bar-block w3-card w3-animate-right" style="display:none;right:0;" id="chatSidebar">
+		<button class="w3-bar-item w3-button w3-large"
+				onclick="chatSidebarClose()">Close &times;</button>
+		<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly></textarea>
+		<input id="chatIn" type="text" name="chatI">
+		<button type="button" onclick="buttonAction()">Send</button>
+	</div>
+
 	<div id="main">
 		<div id="main-container" class="container">
 			<div id="logged">
 				<div id="session">
 					<div class="w3-dark-grey" id="session-header">
 						<div class="w3-container">
-							<button id="openNav" class="w3-button w3-light-grey w3-large" onclick="sidebarOpen()"><i class="fa fa-users" aria-hidden="true"></i></button>
+							<button id="openNav" class="w3-button w3-light-grey" onclick="sidebarOpen()"><i class="fa fa-users" aria-hidden="true"></i></button>
 							<button id="camera" onclick="videoOnOff()"><i id="camIcon" class="fa fa-video-camera" style="color: red"></i></button>
 							<button id="audio" onclick="audioOnOff()"><i id="micIcon" class="fa fa-microphone" style="color: red" aria-hidden="true"></i></button>
-							<button id="share"  type="submit" onclick="shareScreen()"><i class="btn fa fa-upload"></i></button>
-							<button id="shareEnd" class="btn btn-large btn-danger" type="submit" onclick="shareEnd()">
-								End Share </button>
+							<button id="share"  type="submit" onclick="shareScreen()" ><i id="shareScreen" class="btn fa fa-desktop" style="color: black"></i></button>
+							<button id="chatOpenNav"  type="submit" onclick="chatSidebarOpen()" ><i id="chatIcon" class="btn fas fa-comments" aria-hidden="true" style="color: black"></i></button>
 							<form action="/leave-session" method="post">
 								<input type="hidden" name="sessionName" th:value="${sessionName}"/>
 								<input type="hidden" name="token" th:value="${token}"/>
@@ -54,9 +61,6 @@
 									<i class="fa fa-sign-out" aria-hidden="true"></i>
 								</button>
 							</form>
-							<button type="button" onclick="buttonAction()">Chat</button>
-							<input id="chatIn" type="text" name="chatI">
-							<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly></textarea>
 						</div>
 					</div>
 					<div class="w3-container">
@@ -84,6 +88,7 @@
 	let publisher = {};
 	let videoOn = true;
 	let audioOn = true;
+	let shareScreenOn = true;
 	let participant = [];
 
 	let abc = true;
@@ -207,6 +212,19 @@
 		document.getElementById("openNav").style.display = "inline-block";
 	}
 
+	function chatSidebarOpen() {
+		document.getElementById("main").style.marginRight = "10%";
+		document.getElementById("chatSidebar").style.width = "15%";
+		document.getElementById("chatSidebar").style.display = "block";
+		document.getElementById("chatOpenNav").style.display = 'none';
+	}
+
+	function chatSidebarClose() {
+		document.getElementById("main").style.marginRight = "0%";
+		document.getElementById("chatSidebar").style.display = "none";
+		document.getElementById("chatOpenNav").style.display = "inline-block";
+	}
+
 	function leaveSession() {
 		participant.forEach((item, index) => {
 			if (item === nickName) {
@@ -219,55 +237,58 @@
 
 	function shareScreen() {
 
-		abc = false;
-		var userData = {
-			nickName: nickName,
-			userName: userName
-		};
-		removeUserData(userData);
-		cleanMainVideo();
-		session.unpublish(publisher);
-		publisher = OV.initPublisher('video-container', { videoSource: "screen" });
-
-		publisher.once('accessAllowed', (event) => {
-			publisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
-				console.log('User pressed the "Stop sharing" button');
-			});
-			sessionScreen.publish(publisher);
-
-		});
-
-		publisher.once('accessDenied', (event) => {
-			console.warn('ScreenShare: Access Denied');
-		});
-		session.publish(publisher);
-	}
-
-	function shareEnd(){
-
-		abc = false;
-		session.unpublish(publisher);
-		publisher = OV.initPublisher('video-container', {
-			audioSource: undefined,
-			videoSource: undefined,
-			publishAudio: true,
-			publishVideo: true,
-			resolution: '640x480',
-			frameRate: 30,
-			insertMode: 'APPEND',
-			mirror: false
-		});
-		publisher.on('videoElementCreated', (event) => {
-			const userData = {
+		if (shareScreenOn) {
+			shareScreenOn = false;
+			document.getElementById("shareScreen").style = "color: red";
+			var userData = {
 				nickName: nickName,
 				userName: userName
 			};
-			initMainVideo(event.element, userData);
-			appendUserData(event.element, userData);
-			$(event.element).prop('muted', true);
-		});
+			removeUserData(userData);
+			cleanMainVideo();
+			session.unpublish(publisher);
+			publisher = OV.initPublisher('video-container', {videoSource: "screen"});
 
-		session.publish(publisher);
+			publisher.once('accessAllowed', (event) => {
+				publisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+					console.log('User pressed the "Stop sharing" button');
+				});
+				sessionScreen.publish(publisher);
+
+			});
+
+			publisher.once('accessDenied', (event) => {
+				console.warn('ScreenShare: Access Denied');
+			});
+
+			session.publish(publisher);
+		} else {
+
+			shareScreenOn = true;
+			document.getElementById("shareScreen").style = "color: black";
+			session.unpublish(publisher);
+			publisher = OV.initPublisher('video-container', {
+				audioSource: undefined,
+				videoSource: undefined,
+				publishAudio: true,
+				publishVideo: true,
+				resolution: '640x480',
+				frameRate: 30,
+				insertMode: 'APPEND',
+				mirror: false
+			});
+			publisher.on('videoElementCreated', (event) => {
+				const userData = {
+					nickName: nickName,
+					userName: userName
+				};
+				initMainVideo(event.element, userData);
+				appendUserData(event.element, userData);
+				$(event.element).prop('muted', true);
+			});
+
+			session.publish(publisher);
+		}
 	}
 
 	function appendUserData(videoElement, connection) {
