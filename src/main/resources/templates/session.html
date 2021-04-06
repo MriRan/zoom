@@ -38,9 +38,12 @@
 	<div class="w3-sidebar w3-bar-block w3-card w3-animate-right" style="display:none;right:0;" id="chatSidebar">
 		<button class="w3-bar-item w3-button w3-large"
 				onclick="chatSidebarClose()">Close &times;</button>
-		<textarea id="chatBox" name="chtBox" rows="5" cols="50" readonly></textarea>
-		<input id="chatIn" type="text" name="chatI">
-		<button type="button" onclick="buttonAction()">Send</button>
+		<label for="chatBox"></label><textarea id="chatBox" name="chtBox" style="border: none; resize: none" rows="22" cols="30" readonly></textarea>
+		<form class="form-inline">
+			<label for="chatIn"></label><input id="chatIn" type="text" name="chatI">
+			<button type="button" class="btn btn-primary mb-2" onclick="send()">Send</button>
+		</form>
+
 	</div>
 
 	<div id="main">
@@ -53,7 +56,7 @@
 							<button id="camera" onclick="videoOnOff()"><i id="camIcon" class="fa fa-video-camera" style="color: red"></i></button>
 							<button id="audio" onclick="audioOnOff()"><i id="micIcon" class="fa fa-microphone" style="color: red" aria-hidden="true"></i></button>
 							<button id="share"  type="submit" onclick="shareScreen()" ><i id="shareScreen" class="btn fa fa-desktop" style="color: black"></i></button>
-							<button id="chatOpenNav"  type="submit" onclick="chatSidebarOpen()" ><i id="chatIcon" class="btn fas fa-comments" aria-hidden="true" style="color: black"></i></button>
+							<button id="chatOpenNav"  type="submit" onclick="chatSidebarOpen()" ><i id="chatIcon" class="btn fa fa-comments" aria-hidden="true" style="color: black"></i></button>
 							<form action="/leave-session" method="post">
 								<input type="hidden" name="sessionName" th:value="${sessionName}"/>
 								<input type="hidden" name="token" th:value="${token}"/>
@@ -90,8 +93,7 @@
 	let audioOn = true;
 	let shareScreenOn = true;
 	let participant = [];
-
-	let abc = true;
+	let addParticipant = true;
 
 	console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 
@@ -99,9 +101,9 @@
 
 	session = OV.initSession();
 
-	function buttonAction()
-	{
-		var chatVal = document.getElementById("chatIn").value;
+	function send() {
+
+		const chatVal = document.getElementById("chatIn").value;
 
 		session.signal({
 			data: nickName  + " : "+ chatVal,
@@ -118,9 +120,10 @@
 	}
 
 	session.on('signal:my-chat', (event) => {
-		var myTextArea = $('#chatBox');
 
+		const myTextArea = $('#chatBox');
 		myTextArea.val(myTextArea.val()+ '\n' + event.data );
+
 	});
 
 	session.on('streamCreated', (event) => {
@@ -153,7 +156,6 @@
 				mirror: false
 			});
 
-			abc = true;
 			publisher.on('videoElementCreated', (event) => {
 				const userData = {
 					nickName: nickName,
@@ -201,7 +203,7 @@
 		document.getElementById("sidebar").style.display = "block";
 		document.getElementById("openNav").style.display = 'none';
 		document.getElementById("listParticipants").innerHTML = null;
-		participant.forEach((item, index) => {
+		participant.forEach((item) => {
 			document.getElementById("listParticipants").innerHTML += '<li>'+item+'</li>';
 		});
 	}
@@ -214,7 +216,7 @@
 
 	function chatSidebarOpen() {
 		document.getElementById("main").style.marginRight = "10%";
-		document.getElementById("chatSidebar").style.width = "15%";
+		document.getElementById("chatSidebar").style.width = "25%";
 		document.getElementById("chatSidebar").style.display = "block";
 		document.getElementById("chatOpenNav").style.display = 'none';
 	}
@@ -229,7 +231,7 @@
 		participant.forEach((item, index) => {
 			if (item === nickName) {
 				participant.splice(index);
-				return;
+				return true;
 			}
 		});
 		session.disconnect();
@@ -239,8 +241,7 @@
 
 		if (shareScreenOn) {
 			shareScreenOn = false;
-			document.getElementById("shareScreen").style = "color: red";
-			var userData = {
+			const userData = {
 				nickName: nickName,
 				userName: userName
 			};
@@ -262,10 +263,12 @@
 			});
 
 			session.publish(publisher);
+			document.getElementById("shareScreen").style = "color: red";
+
 		} else {
 
 			shareScreenOn = true;
-			document.getElementById("shareScreen").style = "color: black";
+			addParticipant = false
 			session.unpublish(publisher);
 			publisher = OV.initPublisher('video-container', {
 				audioSource: undefined,
@@ -288,6 +291,7 @@
 			});
 
 			session.publish(publisher);
+			document.getElementById("shareScreen").style = "color: black";
 		}
 	}
 
@@ -309,8 +313,10 @@
 		dataNode.id = "data-" + nodeId;
 		dataNode.innerHTML = '<p class="nickName">' + clientData + '</p>';
 		videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
-		if (abc) {
+		if (addParticipant) {
 			participant.push(clientData);
+		} else {
+			addParticipant = true;
 		}
 		addClickListener(videoElement, clientData, serverData);
 	}
