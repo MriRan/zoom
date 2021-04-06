@@ -39,10 +39,12 @@
 		<button class="w3-bar-item w3-button w3-large"
 				onclick="chatSidebarClose()">Close &times;</button>
 		<label for="chatBox"></label><textarea id="chatBox" name="chtBox" style="border: none; resize: none" rows="22" cols="30" readonly></textarea>
-		<form class="form-inline">
-			<label for="chatIn"></label><input id="chatIn" type="text" name="chatI">
-			<button type="button" class="btn btn-primary mb-2" onclick="send()">Send</button>
-		</form>
+<!--		<form class="form-inline" method="post">-->
+			<div style="display: inline-block">
+				<label for="chatIn"></label><input id="chatIn" type="text" name="chatI">
+				<button type="button" class="btn btn-primary mb-2" onclick="send()">Send</button>
+			</div>
+<!--		</form>-->
 
 	</div>
 
