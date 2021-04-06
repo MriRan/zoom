@@ -248,14 +248,15 @@
 			removeUserData(userData);
 			cleanMainVideo();
 			session.unpublish(publisher);
-			publisher = OV.initPublisher('video-container', {videoSource: "screen"});
+			publisher = OV.initPublisher('video-container', {
+				videoSource: "screen",
+				publishAudio: false
+			});
 
 			publisher.once('accessAllowed', (event) => {
 				publisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
 					console.log('User pressed the "Stop sharing" button');
 				});
-				sessionScreen.publish(publisher);
-
 			});
 
 			publisher.once('accessDenied', (event) => {
@@ -288,6 +289,10 @@
 				initMainVideo(event.element, userData);
 				appendUserData(event.element, userData);
 				$(event.element).prop('muted', true);
+				videoOn = !videoOn;
+				audioOn = !audioOn;
+				videoOnOff();
+				audioOnOff();
 			});
 
 			session.publish(publisher);
