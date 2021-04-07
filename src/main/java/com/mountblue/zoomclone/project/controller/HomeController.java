@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 public class HomeController {
 
 
-    @RequestMapping(value = "/dashboard", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/detail", method = { RequestMethod.GET, RequestMethod.POST })
     public String dashboard(@RequestParam String link,
                             Model model,
                             HttpSession httpSession) {
